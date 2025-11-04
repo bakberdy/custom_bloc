@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:custom_bloc/bloc_builder.dart';
 import 'package:custom_bloc/bloc_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -60,13 +61,10 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text('You have pushed the button this many times:'),
-            StreamBuilder(
-              initialData: _counterBloc.state,
-              stream: _counterBloc.stream,
+            BlocBuilder<CounterBloc, CounterState>(
               builder: (context, state) {
-                log('state changed ${state.data?.number}');
                 return Text(
-                  '${state.data?.number}',
+                  '${state.number}',
                   style: Theme.of(context).textTheme.headlineMedium,
                 );
               },
