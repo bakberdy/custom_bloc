@@ -13,6 +13,14 @@ class BlocProvider<B extends Bloc> extends StatefulWidget {
     this.lazy = true,
   }) : super();
 
+  factory BlocProvider.value({required Widget child, required B bloc}) {
+    return BlocProvider(
+      create: () => bloc,
+      lazy: false,
+      child: child,
+    );
+  }
+
   static B of<B extends Bloc>(BuildContext context, {bool listen = true}) {
     if (listen) {
       final provider = context
@@ -63,11 +71,8 @@ class _BlocProviderState<B extends Bloc> extends State<BlocProvider> {
     if (widget.lazy && !_isInitialized) {
       _createBloc();
     }
-    
-    return _InheritedBlocProvider<B>(
-      bloc: _bloc,
-      child: widget.child,
-    );
+
+    return _InheritedBlocProvider<B>(bloc: _bloc, child: widget.child);
   }
 
   @override
@@ -87,5 +92,17 @@ class _InheritedBlocProvider<B extends Bloc> extends InheritedWidget {
   @override
   bool updateShouldNotify(_InheritedBlocProvider<B> oldWidget) {
     return bloc != oldWidget.bloc;
+  }
+}
+
+extension BlocProviderExtension on BuildContext {
+  // Подписка на изменения (для UI)
+  B watch<B extends Bloc>() {
+    return BlocProvider.of<B>(this, listen: true);
+  }
+
+  // БЕЗ подписки (для добавления событий)
+  B read<B extends Bloc>() {
+    return BlocProvider.of<B>(this, listen: false);
   }
 }
