@@ -33,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() { 
-    _counterBloc = BlocProvider.of(context);
+    _counterBloc = BlocProvider.of(context, listen: false);
     super.initState();
   }
 
@@ -44,8 +44,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void _decrementCounter() {
     _counterBloc.add(DecrementEvent());
   }
-
-
 
   @override
   Widget build(BuildContext context) {

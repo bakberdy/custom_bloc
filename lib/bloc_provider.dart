@@ -19,7 +19,7 @@ class BlocProvider<B extends Bloc> extends StatefulWidget {
           .dependOnInheritedWidgetOfExactType<_InheritedBlocProvider<B>>();
 
       if (provider == null) {
-        throw Exception('BlocProvider<$B> не найден в дереве виджетов');
+        throw Exception('BlocProvider<$B> not found on widget tree');
       }
 
       return provider.bloc;
@@ -28,7 +28,7 @@ class BlocProvider<B extends Bloc> extends StatefulWidget {
           .getInheritedWidgetOfExactType<_InheritedBlocProvider<B>>();
 
       if (provider == null) {
-        throw Exception('BlocProvider<$B> не найден в дереве виджетов');
+        throw Exception('BlocProvider<$B> not found on widget tree');
       }
 
       return provider.bloc;
@@ -36,13 +36,46 @@ class BlocProvider<B extends Bloc> extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() => _BlocProviderState();
+  State<StatefulWidget> createState() => _BlocProviderState<B>();
 }
 
-class _BlocProviderState extends State {
+class _BlocProviderState<B extends Bloc> extends State<BlocProvider> {
+  late B _bloc;
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    if (!widget.lazy) {
+      _createBloc();
+    }
+    super.initState();
+  }
+
+  void _createBloc() {
+    if (!_isInitialized) {
+      _bloc = widget.create() as B;
+      _isInitialized = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    throw UnimplementedError();
+    if (widget.lazy && !_isInitialized) {
+      _createBloc();
+    }
+    
+    return _InheritedBlocProvider<B>(
+      bloc: _bloc,
+      child: widget.child,
+    );
+  }
+
+  @override
+  void dispose() {
+    if (_isInitialized) {
+      _bloc.dispose();
+    }
+    super.dispose();
   }
 }
 
